@@ -1,5 +1,5 @@
 from api.lib.factories.admin import AdminFactory
-from api.lib.factories.albums import HardwareFactory
+from api.lib.factories.hardware import HardwareFactory
 
 
 class RootFactory(dict):

@@ -1,5 +1,13 @@
 README
 
+VIRTUAL ENV
+I highly recommend to use a python virtual env by doing the following:
+```virtualenv ~/env/pcbuilder_api```
+```source ~/env/pcbuilder_api/bin/activate```
+
+INSTALL
+Install the project using ```pip install -e /api```
+
 GIT
 Make sure not to push to develop and especially not master. Always make your own branch based on develop and when whatever you're doing is
 done make a pull request. Let someone else of the group review and merge your request. Do not merge your own pull requests.
@@ -10,6 +18,9 @@ We're using Pyramid's URL traversal. This mean we're working with factories. If 
 STYLE GUIDE
 Please keep the following in mind while developing the API https://www.python.org/dev/peps/pep-0008/ . Any code that's not pep 8 valid should not be
 merged.
+
+RUN
+Be sure to run the project in development mode using ```pserve --reload development.ini```
 
 
 
