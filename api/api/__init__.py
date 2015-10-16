@@ -3,17 +3,16 @@ from pyramid.events import subscriber
 from pyramid.events import NewRequest
 import pymongo
 
-from api.resources import Root
+from api.lib.factories.root import RootFactory
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
-    config = Configurator(settings=settings, root_factory=Root)
-    config.add_view('api.views.my_view',
-                    context='api:resources.Root',
-                    renderer='api:templates/mytemplate.pt')
-    config.add_static_view('static', 'api:static')
+    config = Configurator(settings=settings, root_factory=RootFactory)
+    config.add_route('home', '/')
     # MongoDB
+
     def add_mongo_db(event):
         settings = event.request.registry.settings
         url = settings['mongodb.url']
@@ -21,7 +20,7 @@ def main(global_config, **settings):
         db = settings['mongodb_conn'][db_name]
         event.request.db = db
     db_uri = settings['mongodb.url']
-    MongoDB = pymongo.Connection
+    MongoDB = pymongo.MongoClient
     if 'pyramid_debugtoolbar' in set(settings.values()):
         class MongoDB(pymongo.Connection):
             def __html__(self):
@@ -29,5 +28,5 @@ def main(global_config, **settings):
     conn = MongoDB(db_uri)
     config.registry.settings['mongodb_conn'] = conn
     config.add_subscriber(add_mongo_db, NewRequest)
-    config.scan('api')
+    config.scan('api.handlers')
     return config.make_wsgi_app()
