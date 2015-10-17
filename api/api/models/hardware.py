@@ -1,4 +1,5 @@
-from mongoengine import StringField, Document, ListField, DateTimeField, EmbeddedDocumentField
+from mongoengine import (StringField, Document, ListField, DateTimeField,
+                         EmbeddedDocumentField)
 from record import Record
 import datetime
 
@@ -21,4 +22,4 @@ class Hardware(Document):
 
 
 def get_all_hardware():
-    return Hardware.objects
+    return Hardware.objects.all()
