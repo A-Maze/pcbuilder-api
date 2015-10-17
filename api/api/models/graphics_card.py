@@ -1,0 +1,33 @@
+from meta import db
+from models.hardware import Hardware
+
+
+class GraphicsCard(Hardware):
+    videochip = db.StringField(max_length=200)
+    chipset_generation = db.StringField(max_length=200)
+    video_chip_manufacturer = db.StringField(max_length=200)
+    rated_speed_video_chip = db.StringField(max_length=200)
+    max_Turbo_Frequency = db.StringField(max_length=200)
+    computing_cores = db.StringField(max_length=200)
+    memory_size = db.StringField(max_length=200)
+    memory_type = db.StringField(max_length=200)
+    rated_speed_video_memory_chip = db.StringField(max_length=200)
+    memory_bus_width = db.StringField(max_length=200)
+    card_interface = db.StringField(max_length=200)
+    video_out = db.StringField(max_length=200)
+    highest_hdm_version = db.StringField(max_length=200)
+    highest_displayPort_version = db.StringField(max_length=200)
+    video_adapter = db.StringField(max_length=200)
+    directx_version = db.StringField(max_length=200)
+    openl_version = db.StringField(max_length=200)
+    shader_model = db.StringField(max_length=200)
+    length = db.StringField(max_length=200)
+    height = db.StringField(max_length=200)
+    width = db.StringField(max_length=200)
+    number_of_slots = db.StringField(max_length=200)
+    number_of_pins = db.StringField(max_length=200)
+    number_of_6_pins = db.StringField(max_length=200)
+    number_of_8_pins = db.StringField(max_length=200)
+    power_consumption = db.StringField(max_length=200)
+    type_cooling = db.StringField(max_length=200)
+    link_interface = db.StringField(max_length=200)
