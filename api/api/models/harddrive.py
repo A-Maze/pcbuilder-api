@@ -3,6 +3,7 @@ from models.hardware import Hardware
 
 
 class HardDrive(Hardware):
+    hardware_id = db.IntegerField()
     serie = db.StringField(max_length=200)
     product = db.StringField(max_length=200)
     storage = db.StringField(max_length=200)
