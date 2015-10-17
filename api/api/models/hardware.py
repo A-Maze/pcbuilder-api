@@ -15,6 +15,6 @@ class Hardware(db.Document):
     SKU = db.StringField(max_length=200)
     link = db.StringField(max_length=200)
     brand = db.StringField(max_length=200)
-    Uitvoering = db.StringField(max_length=200)
+    execution = db.StringField(max_length=200)
     records = db.ListField(db.EmbeddedDocumentField(Record))
     date_modified = db.DateTimeField(default=datetime.datetime.now)
