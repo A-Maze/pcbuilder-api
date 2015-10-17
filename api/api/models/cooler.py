@@ -1,18 +1,18 @@
-from meta import db
+from mongoengine import StringField
 from models.hardware import Hardware
 
 
 class Cooler(Hardware):
-    Socket = db.StringField(max_length=200)
-    connection_processor_cooling = db.StringField(max_length=200)
-    heatpipes = db.StringField(max_length=200)
-    volume = db.StringField(max_length=200)
-    rotational_speed_min = db.StringField(max_length=200)
-    rotational_speed_max = db.StringField(max_length=200)
-    type_cooling = db.StringField(max_length=200)
-    height = db.StringField(max_length=200)
-    diameter = db.StringField(max_length=200)
-    colors = db.StringField(max_length=200)
-    materials = db.StringField(max_length=200)
-    warranty = db.StringField(max_length=200)
-    particulars = db.StringField(max_length=200)
+    Socket = StringField(max_length=200)
+    connection_processor_cooling = StringField(max_length=200)
+    heatpipes = StringField(max_length=200)
+    volume = StringField(max_length=200)
+    rotational_speed_min = StringField(max_length=200)
+    rotational_speed_max = StringField(max_length=200)
+    type_cooling = StringField(max_length=200)
+    height = StringField(max_length=200)
+    diameter = StringField(max_length=200)
+    colors = StringField(max_length=200)
+    materials = StringField(max_length=200)
+    warranty = StringField(max_length=200)
+    particulars = StringField(max_length=200)

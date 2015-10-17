@@ -1,9 +1,10 @@
-from meta import db
+from mongoengine import (StringField, DateTimeField, IntField, DecimalField,
+                         EmbeddedDocument)
 import datetime
 
 
-class Record(db.EmbeddedDocument):
-    price = db.DecimalField()
-    product = db.IntegerField()
-    webshop = db.StringField(max_length=200)
-    date = db.DateTimeField(default=datetime.datetime.now)
+class Record(EmbeddedDocument):
+    price = DecimalField()
+    product = IntField()
+    webshop = StringField(max_length=200)
+    date = DateTimeField(default=datetime.datetime.now)
