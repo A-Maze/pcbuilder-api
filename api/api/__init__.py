@@ -16,7 +16,7 @@ def main(global_config, **settings):
     def add_mongo_db(event):
         settings = event.request.registry.settings
         url = settings['mongodb.url']
-        db_name = settings['mongodb_name']
+        db_name = settings['mongodb.name']
         db = settings['mongodb_conn'][db_name]
         event.request.db = db
     db_uri = settings['mongodb.url']
