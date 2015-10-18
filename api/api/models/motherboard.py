@@ -1,5 +1,5 @@
 from mongoengine import StringField
-from models.hardware import Hardware
+from api.models.hardware import Hardware
 
 
 class Motherboard(Hardware):

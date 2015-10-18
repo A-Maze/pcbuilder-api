@@ -19,6 +19,7 @@ class Hardware(Document):
     execution = StringField(max_length=200)
     records = ListField(EmbeddedDocumentField(Record))
     date_modified = DateTimeField(default=datetime.datetime.now)
+    meta = {'allow_inheritance': True}
 
 
 def get_all_hardware():
