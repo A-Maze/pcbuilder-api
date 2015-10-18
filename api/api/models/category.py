@@ -1,4 +1,5 @@
 from mongoengine import Document, ReferenceField, ListField, StringField
+from hardware import Hardware #noqa
 
 
 class Category(Document):

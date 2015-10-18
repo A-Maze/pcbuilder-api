@@ -1,11 +1,12 @@
+import datetime
 from mongoengine import (StringField, Document, ListField, DateTimeField,
                          EmbeddedDocumentField, ReferenceField)
 from record import Record
-import datetime
+
 
 
 class Hardware(Document):
-    category = StringField(max_length=120)
+    category = ReferenceField('Category')
     name = StringField(max_length=500)
     subname = StringField(max_length=500)
     info = StringField(max_length=500)
