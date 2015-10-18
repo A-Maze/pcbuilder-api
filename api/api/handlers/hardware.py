@@ -1,4 +1,5 @@
 import logging
+import json
 from bson.json_util import dumps
 from pyramid.view import view_config
 from api.lib.factories.hardware import HardwareFactory
@@ -20,7 +21,7 @@ hardware_factory_view = partial(
 def default_hardware_view(request):
     """ Returns all hardware models """
     hardware = get_all_hardware()
-    hardware_dict = [dumps(obj.to_mongo()) for obj in hardware]
+    hardware_dict = [json.loads(dumps(obj.to_mongo())) for obj in hardware]
     return {"hardware": hardware_dict}
 
 
