@@ -1,5 +1,5 @@
 from mongoengine import (StringField, Document, ListField, DateTimeField,
-                         EmbeddedDocumentField)
+                         EmbeddedDocumentField, ReferenceField)
 from record import Record
 import datetime
 
@@ -19,7 +19,3 @@ class Hardware(Document):
     execution = StringField(max_length=200)
     records = ListField(EmbeddedDocumentField(Record))
     date_modified = DateTimeField(default=datetime.datetime.now)
-
-
-def get_all_hardware():
-    return Hardware.objects.all()
