@@ -1,19 +1,19 @@
-from meta import db
+from mongoengine import StringField
 from models.hardware import Hardware
 
 
 class Memory(Hardware):
-    memory_specification = db.StringField(max_length=500)
-    serie = db.StringField(max_length=200)
-    product = db.StringField(max_length=200)
-    memory_size = db.StringField(max_length=200)
-    number = db.StringField(max_length=200)
-    module_size = db.StringField(max_length=200)
-    Price_per_gb = db.StringField(max_length=200)
-    memory_type = db.StringField(max_length=200)
-    memory_specification = db.StringField(max_length=200)
-    low_voltage_ddr = db.StringField(max_length=200)
-    memory_cas_latency = db.StringField(max_length=200)
-    tension = db.StringField(max_length=200)
-    warranty = db.StringField(max_length=200)
-    particulars = db.StringField(max_length=200)
+    memory_specification = StringField(max_length=500)
+    serie = StringField(max_length=200)
+    product = StringField(max_length=200)
+    memory_size = StringField(max_length=200)
+    number = StringField(max_length=200)
+    module_size = StringField(max_length=200)
+    Price_per_gb = StringField(max_length=200)
+    memory_type = StringField(max_length=200)
+    memory_specification = StringField(max_length=200)
+    low_voltage_ddr = StringField(max_length=200)
+    memory_cas_latency = StringField(max_length=200)
+    tension = StringField(max_length=200)
+    warranty = StringField(max_length=200)
+    particulars = StringField(max_length=200)
