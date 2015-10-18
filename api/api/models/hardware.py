@@ -23,3 +23,7 @@ class Hardware(Document):
 
 def get_all_hardware():
     return Hardware.objects.all()
+
+
+def get_hardware(id_, category):
+    return
