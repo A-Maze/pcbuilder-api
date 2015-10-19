@@ -23,7 +23,7 @@ category_view = partial(
 
 
 @category_factory_view(request_method="GET")
-def default_hardware_view(request):
+def default_category_view(request):
     """ Returns all categories """
     categories = get_all_categories()
     categories_dict = [json.loads(dumps(obj.to_mongo())) for obj in categories]
