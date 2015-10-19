@@ -1,5 +1,5 @@
 from api.lib.factories.admin import AdminFactory
-from api.lib.factories.hardware import HardwareFactory
+from api.lib.factories.category import CategoryFactory
 
 
 class RootFactory(dict):
@@ -9,5 +9,5 @@ class RootFactory(dict):
         self.__name__ = None
         self.__parent__ = None
 
-        self['hardware'] = HardwareFactory(self, 'hardware')
+        self['category'] = CategoryFactory(self, 'category')
         self['admin'] = AdminFactory(self, 'admin')

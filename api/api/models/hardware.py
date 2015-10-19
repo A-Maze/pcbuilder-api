@@ -1,11 +1,12 @@
-from mongoengine import (StringField, Document, ListField, DateTimeField,
-                         EmbeddedDocumentField)
-from record import Record
 import datetime
+from mongoengine import (StringField, Document, ListField, DateTimeField,
+                         EmbeddedDocumentField, ReferenceField)
+from record import Record
+
 
 
 class Hardware(Document):
-    category = StringField(max_length=120)
+    category = ReferenceField('Category')
     name = StringField(max_length=500)
     subname = StringField(max_length=500)
     info = StringField(max_length=500)
@@ -19,7 +20,3 @@ class Hardware(Document):
     execution = StringField(max_length=200)
     records = ListField(EmbeddedDocumentField(Record))
     date_modified = DateTimeField(default=datetime.datetime.now)
-
-
-def get_all_hardware():
-    return Hardware.objects.all()
