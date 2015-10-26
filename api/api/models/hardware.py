@@ -1,8 +1,7 @@
 import datetime
-from mongoengine import (StringField, EmbeddedDocument, ListField, DateTimeField,
-                         EmbeddedDocumentField, ReferenceField)
+from mongoengine import (StringField, EmbeddedDocument, ListField,
+                         DateTimeField, EmbeddedDocumentField, ReferenceField)
 from record import Record
-
 
 
 class Hardware(EmbeddedDocument):

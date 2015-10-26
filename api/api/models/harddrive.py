@@ -2,8 +2,7 @@ from mongoengine import StringField, IntField
 from models.hardware import Hardware
 
 
-class HardDrive(Hardware):
-    hardware_id = IntField()
+class Harddrive(Hardware):
     serie = StringField(max_length=200)
     product = StringField(max_length=200)
     storage = StringField(max_length=200)

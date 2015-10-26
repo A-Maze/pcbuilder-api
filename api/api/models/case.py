@@ -2,7 +2,7 @@ from mongoengine import StringField
 from models.hardware import Hardware
 
 
-class case(Hardware):
+class Case(Hardware):
     serie = StringField(max_length=50)
     barebonetype = StringField(max_length=200)
     case_bay_extern = StringField(max_length=50)

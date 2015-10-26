@@ -33,4 +33,4 @@ def return_product(request):
     product_id = request.subpath[0]
     product = request.context.get_product(product_id)
     product_json = json.loads(dumps(product.to_mongo()))
-    return {'product':product_json}
+    return {'product': product_json}
