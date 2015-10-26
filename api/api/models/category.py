@@ -1,14 +1,18 @@
-from mongoengine import Document, ReferenceField, ListField, StringField
+import logging
+from mongoengine import (Document, ListField,
+                         StringField, EmbeddedDocumentField)
+from bson.objectid import ObjectId
 from hardware import Hardware #noqa
 
+log = logging.getLogger(__name__)
 
 class Category(Document):
     name = StringField(max_length=120)
-    products = ListField(ReferenceField('Hardware'))
+    products = ListField(EmbeddedDocumentField('Hardware'))
 
-    def product(self, id_):
-        return (item for item in self.product if item[id] == id_).next()
-
+    def get_product(self, id_):
+        key_id = ObjectId(id_)
+        return [product for product in self.products if product.id == key_id][0]
 
 def get_all_categories():
     return Category.objects.all()

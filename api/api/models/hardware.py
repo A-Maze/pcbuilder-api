@@ -1,11 +1,11 @@
 import datetime
-from mongoengine import (StringField, Document, ListField, DateTimeField,
+from mongoengine import (StringField, EmbeddedDocument, ListField, DateTimeField,
                          EmbeddedDocumentField, ReferenceField)
 from record import Record
 
 
 
-class Hardware(Document):
+class Hardware(EmbeddedDocument):
     category = ReferenceField('Category')
     name = StringField(max_length=500)
     subname = StringField(max_length=500)
