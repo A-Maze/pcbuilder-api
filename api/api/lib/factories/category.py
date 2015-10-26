@@ -1,6 +1,5 @@
 import logging
 from api.lib.factories import BaseFactory
-from api.lib.factories.product import ProductFactory
 from api.models.category import get_category_by_name
 
 log = logging.getLogger(__name__)
