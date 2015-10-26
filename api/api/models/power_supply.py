@@ -2,7 +2,7 @@ from mongoengine import StringField
 from models.hardware import Hardware
 
 
-class PowerSupply(Hardware):
+class Powersupply(Hardware):
     power_watt = StringField(max_length=200)
     product = StringField(max_length=200)
     _12v_rails = StringField(max_length=200)

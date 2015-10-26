@@ -2,7 +2,7 @@ from mongoengine import StringField
 from models.hardware import Hardware
 
 
-class dvd(Hardware):
+class Dvd(Hardware):
     drive_bay = StringField(max_length=200)
     Optical_drive_type = StringField(max_length=200)
     hard_drive_bus = StringField(max_length=200)
