@@ -1,9 +1,14 @@
 import logging
 import json
-from bson.json_util import dumps
-from pyramid.view import view_config
-from api.models.category import Category
 from functools import partial
+from bson.json_util import dumps
+from bson.objectid import ObjectId
+
+from pyramid.view import view_config
+
+from api.models.category import Category
+from api.models.hardware import Hardware
+
 
 log = logging.getLogger(__name__)
 
@@ -34,3 +39,19 @@ def return_product(request):
     product = request.context.get_product(product_id)
     product_json = json.loads(dumps(product.to_mongo()))
     return {'product': product_json}
+
+
+@product_view(request_method="POST")
+def save_product(request):
+    data = json.dumps(request.json_body)
+    if request.subpath:
+        product = request.context.get_product(request.subpath[0])
+    else:
+        product = Hardware()  # this should select model based on category
+        product.category = request.context
+        product.id = ObjectId()
+    product.from_json(data)
+    product.save(force_insert=True)
+    request.context.products.append(product)
+    request.context.save()
+    return {"message": "product saved"}
