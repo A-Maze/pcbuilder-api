@@ -15,8 +15,7 @@ class Category(Document):
 
     def get_product(self, id_):
         key_id = ObjectId(id_)
-        return [product for product in self.products
-                if product._id == key_id][0]
+        return self.products.get(_id=key_id)
 
 
 def get_all_categories():
