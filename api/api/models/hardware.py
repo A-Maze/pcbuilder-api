@@ -7,7 +7,7 @@ from record import Record
 
 class Hardware(DynamicEmbeddedDocument):
     _id = ObjectIdField()
-    category = ReferenceField('Category')
+    category = StringField(max_length=300)
     name = StringField(max_length=500)
     subname = StringField(max_length=500)
     info = StringField(max_length=500)
