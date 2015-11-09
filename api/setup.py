@@ -5,7 +5,14 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, '../README.md')).read()
 
-requires = ['pyramid', 'WebError', 'mongoengine']
+requires = [
+    'pyramid',
+    'WebError',
+    'mongoengine']
+
+test_requires = [
+    'nose'
+]
 
 setup(name='api',
       version='0.0',
@@ -25,7 +32,7 @@ setup(name='api',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require=test_requires,
       test_suite="api",
       entry_points = """\
       [paste.app_factory]
