@@ -60,17 +60,17 @@ def return_product(request):
 @product_view(request_method="POST")
 def save_product(request):
     """ handles both update and create requests """
-    data = json.dumps(request.json_body)
+    data = request.json_body
     if request.subpath:
         try:
             product = request.context.get_product(request.subpath[0])
-        except:
-            return{"message": "product not found"}
+        except DoesNotExist:
+            return {"message": "product not found"}
     else:
         product = Hardware()
-        product.category = request.context
         product._id = ObjectId()
-    product.from_json(data)
-    request.context.products.append(product)
-    request.context.save()
+        product.category = request.context.name
+    for field in data:
+        setattr(product, field, data[field])
+    request.context.products.save()
     return {"message": "product saved"}
