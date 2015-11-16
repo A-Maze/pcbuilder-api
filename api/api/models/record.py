@@ -6,5 +6,5 @@ import datetime
 class Record(EmbeddedDocument):
     price = DecimalField()
     product = IntField()
-    webshop = StringField(max_length=200)
+    webshop = StringField()
     date = DateTimeField(default=datetime.datetime.now)
