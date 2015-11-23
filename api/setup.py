@@ -8,7 +8,8 @@ README = open(os.path.join(here, '../README.md')).read()
 requires = [
     'pyramid',
     'WebError',
-    'mongoengine']
+    'mongoengine',
+    'jsonschema']
 
 test_requires = [
     'nose'

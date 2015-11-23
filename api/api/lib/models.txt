@@ -216,7 +216,7 @@ class PowerSupplySchema(Schema):
     depth = String(required=False)
     warranty = String(required=False)
     particulars = String(required=False)
-    
+
 
 class ProcessorSchema(Schema):
     serie = String(required=False)

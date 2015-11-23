@@ -7,12 +7,13 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
 from mongoengine.queryset import DoesNotExist
+from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
 
 from api.models.category import Category
 from api.models.hardware import Hardware
-
+from jsonschema import validate
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +62,11 @@ def return_product(request):
 def save_product(request):
     """ handles both update and create requests """
     data = request.json_body
+    try:
+        validate(data, request.context.product_schema)
+    except ValidationError:
+        return {"message": "invalid data"}
+
     if request.subpath:
         try:
             product = request.context.get_product(request.subpath[0])
