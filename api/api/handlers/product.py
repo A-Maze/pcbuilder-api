@@ -42,12 +42,12 @@ def return_products(request):
 def return_product(request):
     """ returns a specific product in a category based on the id """
     try:
-        product_id = request.subpath[0]
+        key = request.subpath[0]
     except IndexError:
         return {"message": "Please specify a product id"}
 
     try:
-        product = request.context.get_product(product_id)
+        product = request.context.get_product(key)
     except InvalidId:
         return {"message": "Invalid id given"}
     except DoesNotExist:

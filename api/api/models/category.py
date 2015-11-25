@@ -1,7 +1,8 @@
 import logging
+
 from mongoengine import (Document,
                          StringField, EmbeddedDocumentListField)
-from bson.objectid import ObjectId
+
 from hardware import Hardware  # noqa
 
 log = logging.getLogger(__name__)
@@ -12,9 +13,11 @@ class Category(Document):
     products = EmbeddedDocumentListField('Hardware')
     product_schema = StringField()
 
-    def get_product(self, id_):
-        key_id = ObjectId(id_)
-        return self.products.get(_id=key_id)
+    def get_product(self, key):
+        return self.products.exclude(
+                                    _id=key,
+                                    ean=key,
+                                    sku=key).first()
 
 
 def get_all_categories():
