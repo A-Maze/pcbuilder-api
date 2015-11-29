@@ -1,7 +1,7 @@
 import logging
 from mongoengine import (Document,
                          StringField, EmbeddedDocumentListField)
-from bson.objectid import ObjectId
+from mongoengine.queryset import DoesNotExist
 from hardware import Hardware  # noqa
 
 log = logging.getLogger(__name__)
@@ -12,9 +12,13 @@ class Category(Document):
     products = EmbeddedDocumentListField('Hardware')
     product_schema = StringField()
 
-    def get_product(self, id_):
-        key_id = ObjectId(id_)
-        return self.products.get(_id=key_id)
+    def get_product(self, key):
+        for product in self.products:
+            if (str(product._id) == key or
+               product.ean == key or
+               product.sku == key):
+                    return product
+            raise DoesNotExist
 
 
 def get_all_categories():
