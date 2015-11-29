@@ -61,15 +61,15 @@ def return_product(request):
 def save_product(request):
     """ handles both update and create requests """
     data = request.json_body
-    if request.subpath:
-        try:
-            product = request.context.get_product(request.subpath[0])
-        except DoesNotExist:
-            return {"message": "product not found"}
-    else:
+    try:
+        product = request.context.get_product(request.subpath[0])
+    except InvalidId:
+        return {"message": "Invalid id given"}
+    except DoesNotExist:
         product = Hardware()
         product._id = ObjectId()
         product.category = request.context.name
+
     for field in data:
         setattr(product, field, data[field])
     request.context.products.save()
