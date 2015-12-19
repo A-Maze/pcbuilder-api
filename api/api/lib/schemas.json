@@ -1,0 +1,90 @@
+{
+    "title" : "... Schema",
+    "type" : "object",
+    "properties": {
+        "name": {"type": "string"},
+        "subname": {"type": "string"},
+        "info": {"type": "string"},
+        "image": {"type": "string"},
+        "ean": {"type": "string"},
+        "sku": {"type": "string"},
+        "link": {"type": "string"},
+        "brand": {"type": "string"}
+    },
+    "required" : ["name"],
+    "additionalProperties": true
+}
+
+{"title" : "Motherboard Schema",
+    "type" : "object",
+    "properties": {
+        "name": {"type": "string"},
+        "subname": {"type": "string"},
+        "info": {"type": "string"},
+        "image": {"type": "string"},
+        "ean": {"type": "string"},
+        "sku": {"type": "string"},
+        "link": {"type": "string"},
+        "brand": {"type": "string"},
+        "socket" : {"type": "string"},
+        "memory_type": {"type": "string"},
+        "form_factor" : {"type": "string"}
+    },
+    "required" : ["name", "socket", "memory_type"],
+    "additionalProperties": true
+}
+
+{
+    "title" : "Processor Schema",
+    "type" : "object",
+    "properties": {
+        "name": {"type": "string"},
+        "subname": {"type": "string"},
+        "info": {"type": "string"},
+        "image": {"type": "string"},
+        "ean": {"type": "string"},
+        "sku": {"type": "string"},
+        "link": {"type": "string"},
+        "brand": {"type": "string"},
+        "socket": {"type": "string"}
+    },
+    "required" : ["name"],
+    "additionalProperties": true
+}
+
+{
+    "title" : "Memory Schema",
+    "type" : "object",
+    "properties": {
+        "name": {"type": "string"},
+        "subname": {"type": "string"},
+        "info": {"type": "string"},
+        "image": {"type": "string"},
+        "ean": {"type": "string"},
+        "sku": {"type": "string"},
+        "link": {"type": "string"},
+        "brand": {"type": "string"},
+        "memory_type": {"type": "string"}
+    },
+    "required" : ["name"],
+    "additionalProperties": true
+}
+
+{
+    "title" : "Video Card Schema",
+    "type" : "object",
+    "properties": {
+        "name": {"type": "string"},
+        "subname": {"type": "string"},
+        "info": {"type": "string"},
+        "image": {"type": "string"},
+        "ean": {"type": "string"},
+        "sku": {"type": "string"},
+        "link": {"type": "string"},
+        "brand": {"type": "string"},
+        "card_interface": {"type": "string"}
+    },
+    "required" : ["name"],
+    "additionalProperties": true
+}
+{    "title" : "... Schema",    "type" : "object",    "properties": {        "name": {"type": "string"},        "subname": {"type": "string"},        "info": {"type": "string"},        "image": {"type": "string"},        "ean": {"type": "string"},        "sku": {"type": "string"},        "link": {"type": "string"},        "brand": {"type": "string"}    },    "required" : ["name"],    "additionalProperties": true}
