@@ -27,8 +27,7 @@ product_view = partial(
     permission='public',
     renderer='json',
     context=Category,
-    name='product'
-    )
+    name='product')
 
 
 @products_view(request_method="GET")
@@ -63,10 +62,9 @@ def save_product(request):
     """ handles both update and create requests """
     data = request.json_body
     try:
-        validate(data, request.context.product_schema)
+        validate(data, json.loads(request.context.product_schema))
     except ValidationError:
         return {"message": "invalid data"}
-
     if request.subpath:
         try:
             product = request.context.get_product(request.subpath[0])
@@ -76,7 +74,12 @@ def save_product(request):
         product = Hardware()
         product._id = ObjectId()
         product.category = request.context.name
+
     for field in data:
-        setattr(product, field, data[field])
+        new_field = field.replace(".", "")
+        print new_field
+        print new_field.encode('utf8')
+        setattr(product, new_field, data[field])
+    request.context.products.append(product)
     request.context.products.save()
     return {"message": "product saved"}
