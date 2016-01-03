@@ -10,11 +10,10 @@ from mongoengine.queryset import DoesNotExist
 from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
-
 from api.models.category import Category
+from api.models.record import Record
 from api.models.hardware import Hardware
 from jsonschema import validate
-
 log = logging.getLogger(__name__)
 
 products_view = partial(
@@ -28,6 +27,13 @@ product_view = partial(
     renderer='json',
     context=Category,
     name='product')
+
+record_view = partial(
+    view_config,
+    permission='public',
+    renderer='json',
+    context=Category,
+    name='record')
 
 
 @products_view(request_method="GET")
@@ -80,6 +86,36 @@ def save_product(request):
         print new_field
         print new_field.encode('utf8')
         setattr(product, new_field, data[field])
+
     request.context.products.append(product)
     request.context.products.save()
     return {"message": "product saved"}
+
+
+@record_view(request_method="POST")
+def save_records(request):
+    """ handles the records requests """
+    data = request.json_body
+    ean_numbers = data['ean'].split()
+    products = request.context.products
+    print data
+    for number in ean_numbers:
+        print number
+        product = products.filter(ean=number)
+        if product:
+            break
+    if not product:
+        product = products.filter(sku=data['sku'])
+        if not product:
+            print "not found"
+            return {"message": "product not found"}
+
+    print product
+
+    record = Record()
+    for field in data:
+        setattr(record, field, data[field])
+
+    return {
+        "message": "record saved"
+    }
