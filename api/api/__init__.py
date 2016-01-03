@@ -2,12 +2,15 @@ from pyramid.config import Configurator
 
 from api.lib.factories.root import RootFactory
 from mongoengine import connect
+import sys
 
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
     config = Configurator(settings=settings, root_factory=RootFactory)
+    reload(sys)  # Reload does the trick!
+    sys.setdefaultencoding('UTF8')
     # MongoDB
     db_name = settings['mongodb.db_name']
     db_host = settings['mongodb.host']

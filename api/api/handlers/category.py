@@ -18,15 +18,14 @@ category_view = partial(
     view_config,
     context=Category,
     permission='public',
-    renderer='json'
-    )
+    renderer='json')
 
 
 @category_factory_view(request_method="GET")
 def default_category_view(request):
     """ Returns all categories """
     categories = get_all_categories()
-    categories_dict = [json.loads(dumps(obj.to_mongo())) for obj in categories]
+    categories_dict = [json.loads(dumps(obj['name'])) for obj in categories]  # noqa
     return {"categories": categories_dict}
 
 
