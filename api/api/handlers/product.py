@@ -10,14 +10,29 @@ from mongoengine.queryset import DoesNotExist
 
 from pyramid.view import view_config
 
+from api.lib.factories.product import ProductFactory, FilterFactory
+from api.lib.factories.category import CategoryFactory
 from api.models.category import Category
 from api.models.hardware import Hardware
 
 
 log = logging.getLogger(__name__)
 
+product_factory_view = partial(
+    view_config,
+    context=ProductFactory,
+    permission='public',
+    renderer='json')
+
+filter_factory_view = partial(
+    view_config,
+    context=FilterFactory,
+    permission='public',
+    renderer='json')
+
 products_view = partial(
     view_config,
+    containment=CategoryFactory,
     permission='public',
     renderer='json')
 
@@ -26,8 +41,7 @@ product_view = partial(
     permission='public',
     renderer='json',
     context=Category,
-    name='product'
-    )
+    name='product')
 
 
 @products_view(request_method="GET")
@@ -74,3 +88,8 @@ def save_product(request):
         setattr(product, field, data[field])
     request.context.products.save()
     return {"message": "product saved"}
+
+
+@product_factory_view(request_method="GET")
+def list_products(request):
+    return request.context.list_products()
