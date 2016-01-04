@@ -11,9 +11,11 @@ class ProductFactory(BaseFactory):
         self['filters'] = FilterFactory(self, 'filter')
 
     def list_products(self):
-        products = []
-        for category in get_all_categories():
-            products += category.products
+        product_lists = [category.products for category in
+                         get_all_categories()]
+        return [product.to_mongo() for product_list in product_lists for
+                product in product_list]
+
 
 class FilterFactory(BaseFactory):
     def __init__(self, *args, **kwargs):

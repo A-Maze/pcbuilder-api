@@ -1,7 +1,11 @@
+import datetime
 import sys
+from bson.objectid import ObjectId
 from pyramid.config import Configurator
+from pyramid.renderers import JSON
 
 from api.lib.factories.root import RootFactory
+from api.lib.renderer import object_id_adapter, datetime_adapter
 from mongoengine import connect
 
 
@@ -24,4 +28,10 @@ def main(global_config, **settings):
             port=db_port)
     config.add_route('home', '/')
     config.scan('api.handlers')
+
+    renderers = {'json': JSON()}
+    for name, renderer in renderers.items():
+        renderer.add_adapter(ObjectId, object_id_adapter)
+        renderer.add_adapter(datetime.datetime, datetime_adapter)
+        config.add_renderer(name, renderer)
     return config.make_wsgi_app()
