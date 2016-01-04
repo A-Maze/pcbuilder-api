@@ -98,23 +98,27 @@ def save_records(request):
     data = request.json_body
     ean_numbers = data['ean'].split()
     products = request.context.products
-    print data
     for number in ean_numbers:
-        print number
-        product = products.filter(ean=number)
+        # needs contains here.....
+        product = products.filter(ean=str(number)).first()
         if product:
+            print 'foud'
             break
+
     if not product:
-        product = products.filter(sku=data['sku'])
+        product = products.filter(sku=str(data['sku']))
         if not product:
             print "not found"
             return {"message": "product not found"}
-
-    print product
-
-    record = Record()
-    for field in data:
-        setattr(record, field, data[field])
+    else:
+        record = Record()
+        for field in data:
+            setattr(record, field, data[field])
+        # how the fuck do i save the record to the product i found? 
+        print dir(product)
+        # product.record does not exist sooo :D?
+        product.append(record)
+        product.save()
 
     return {
         "message": "record saved"
