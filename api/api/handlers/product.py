@@ -12,8 +12,7 @@ from pyramid.view import view_config
 
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.lib.factories.category import CategoryFactory
-from api.models.category import (Category, get_all_categories,
-                                 get_category_by_name)
+from api.models.category import (Category, get_all_categories)
 from api.models.hardware import Hardware
 
 
@@ -97,7 +96,7 @@ def list_products(request):
             product in product_list]
 
 
-def _get_products_list(self):
+def _get_products_list():
     return [category.products for category in get_all_categories()]
 
 
@@ -106,24 +105,32 @@ def list_filters(request):
     return _process_product_filters(_get_products_list())
 
 
-def get_filters(request):
-    return _process_product_filters([request.context])
-
-
 def _process_product_filters(products_list):
     filter_list = []
     for products in products_list:
-        category_filters = {"filters": {},
-                            "category": products[0].category}
-        filter_fields = json.loads(
-            get_category_by_name(products[0].category).product_schema
-        )["required"]
+        # List the column that this category can be filtered on
+        try:
+            category_filters = {"filters": {},
+                                "category": products[0].category}
+            filter_fields = json.loads(
+                str(products[0]._instance.product_schema)
+            )["required"]
+            filter_fields.remove("name")  # We don't need to name in filters
+
+        except KeyError:
+            # If we can't find the products category we can't use it
+            log.info("Category not found: {}".format(products[0].category))
 
         for product in products:
+            # Check the possible filter values per product
             for key in filter_fields:
-
-                category_filters["filters"].setdefault(
-                    key, set()).add(product[key])
+                try:
+                    category_filters["filters"].setdefault(
+                        key, set()).add(product[key])
+                except KeyError:
+                    log.info("key {} not found for category {}".format(
+                        key, products[0].category
+                    ))
 
         filter_list.append(category_filters)
 

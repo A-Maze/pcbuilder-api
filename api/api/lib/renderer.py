@@ -11,3 +11,6 @@ def datetime_adapter(obj, request):
             # representation) set the
             # TZ to UTC.
             return obj.isoformat()
+
+def set_adapter(obj, request):
+    return list(obj)
