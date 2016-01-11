@@ -12,7 +12,8 @@ from pyramid.view import view_config
 
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.lib.factories.category import CategoryFactory
-from api.models.category import Category
+from api.models.category import (Category, get_all_categories,
+                                 get_category_by_name)
 from api.models.hardware import Hardware
 
 
@@ -92,4 +93,38 @@ def save_product(request):
 
 @product_factory_view(request_method="GET")
 def list_products(request):
-    return request.context.list_products()
+    return [product.to_mongo() for product_list in _get_products_list() for
+            product in product_list]
+
+
+def _get_products_list(self):
+    return [category.products for category in get_all_categories()]
+
+
+@filter_factory_view(request_method="GET")
+def list_filters(request):
+    return _process_product_filters(_get_products_list())
+
+
+def get_filters(request):
+    return _process_product_filters([request.context])
+
+
+def _process_product_filters(products_list):
+    filter_list = []
+    for products in products_list:
+        category_filters = {"filters": {},
+                            "category": products[0].category}
+        filter_fields = json.loads(
+            get_category_by_name(products[0].category).product_schema
+        )["required"]
+
+        for product in products:
+            for key in filter_fields:
+
+                category_filters["filters"].setdefault(
+                    key, set()).add(product[key])
+
+        filter_list.append(category_filters)
+
+    return filter_list

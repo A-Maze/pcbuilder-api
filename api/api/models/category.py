@@ -2,7 +2,7 @@ import logging
 from mongoengine import (Document,
                          StringField, EmbeddedDocumentListField)
 from mongoengine.queryset import DoesNotExist
-from hardware import Hardware  # noqa
+from api.models.hardware import Hardware  # noqa
 
 log = logging.getLogger(__name__)
 
