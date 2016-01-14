@@ -10,14 +10,29 @@ from mongoengine.queryset import DoesNotExist
 
 from pyramid.view import view_config
 
-from api.models.category import Category
+from api.lib.factories.product import ProductFactory, FilterFactory
+from api.lib.factories.category import CategoryFactory
+from api.models.category import (Category, get_all_categories)
 from api.models.hardware import Hardware
 
 
 log = logging.getLogger(__name__)
 
+product_factory_view = partial(
+    view_config,
+    context=ProductFactory,
+    permission='public',
+    renderer='json')
+
+filter_factory_view = partial(
+    view_config,
+    context=FilterFactory,
+    permission='public',
+    renderer='json')
+
 products_view = partial(
     view_config,
+    containment=CategoryFactory,
     permission='public',
     renderer='json')
 
@@ -26,8 +41,7 @@ product_view = partial(
     permission='public',
     renderer='json',
     context=Category,
-    name='product'
-    )
+    name='product')
 
 
 @products_view(request_method="GET")
@@ -74,3 +88,50 @@ def save_product(request):
         setattr(product, field, data[field])
     request.context.products.save()
     return {"message": "product saved"}
+
+
+@product_factory_view(request_method="GET")
+def list_products(request):
+    return [product.to_mongo() for product_list in _get_products_list() for
+            product in product_list]
+
+
+def _get_products_list():
+    return [category.products for category in get_all_categories()]
+
+
+@filter_factory_view(request_method="GET")
+def list_filters(request):
+    return _process_product_filters(_get_products_list())
+
+
+def _process_product_filters(products_list):
+    filter_list = []
+    for products in products_list:
+        # List the column that this category can be filtered on
+        try:
+            category_filters = {"filters": {},
+                                "category": products[0].category}
+            filter_fields = json.loads(
+                str(products[0]._instance.product_schema)
+            )["required"]
+            filter_fields.remove("name")  # We don't need to name in filters
+
+        except KeyError:
+            # If we can't find the products category we can't use it
+            log.info("Category not found: {}".format(products[0].category))
+
+        for product in products:
+            # Check the possible filter values per product
+            for key in filter_fields:
+                try:
+                    category_filters["filters"].setdefault(
+                        key, set()).add(product[key])
+                except KeyError:
+                    log.info("key {} not found for category {}".format(
+                        key, products[0].category
+                    ))
+
+        filter_list.append(category_filters)
+
+    return filter_list
