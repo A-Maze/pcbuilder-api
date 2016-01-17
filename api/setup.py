@@ -8,7 +8,7 @@ README = open(os.path.join(here, '../README.md')).read()
 requires = [
     'pyramid',
     'pyramid_debugtoolbar',
-    'PasteDeploy',
+    'paste',
     'mongoengine']
 
 test_requires = [
