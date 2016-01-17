@@ -1,5 +1,4 @@
 import datetime
-import sys
 from bson.objectid import ObjectId
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
@@ -13,8 +12,6 @@ def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
     config = Configurator(settings=settings, root_factory=RootFactory)
-    reload(sys)
-    sys.setdefaultencoding('UTF8')
     # MongoDB
     db_name = settings['mongodb.db_name']
     db_host = settings['mongodb.host']
