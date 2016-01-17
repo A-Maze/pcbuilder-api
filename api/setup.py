@@ -9,6 +9,7 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'paste',
+    'redis',
     'mongoengine']
 
 test_requires = [
