@@ -32,4 +32,8 @@ def get_all_categories():
 
 
 def get_category_by_name(name):
-    return Category.objects(name=name).first()
+    category = json.loads(redis.get('category_{}'.format(name)).decode('utf-8'))
+    if not category:
+        category = Category.objects(name=name).first().to_json()
+        redis.set('category_{}'.format(name), category)
+    return category
