@@ -9,7 +9,10 @@ requires = [
     'pyramid',
     'WebError',
     'mongoengine',
-    'jsonschema']
+    'jsonschema'
+    'pyramid_debugtoolbar',
+    'paste',
+    'mongoengine']
 
 test_requires = [
     'nose'
