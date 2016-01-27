@@ -4,7 +4,7 @@ from mongoengine import (Document,
                          StringField, EmbeddedDocumentListField)
 from mongoengine.queryset import DoesNotExist
 from api.models.hardware import Hardware  # noqa
-from api.models.meta import redis_session as redis
+from api.models.meta import RedisSession
 
 log = logging.getLogger(__name__)
 
@@ -24,16 +24,21 @@ class Category(Document):
 
 
 def get_all_categories():
-    categories = json.loads(redis.get('categories').decode('utf-8'))
+    categories = RedisSession().session.get('categories')
     if not categories:
         categories = Category.objects.all().to_json()
-        redis.set('categories', categories)
+        RedisSession().session.set('categories', categories)
+        categories = json.loads(categories)
+    else:
+        categories = json.loads(categories.decode('utf-8'))
     return categories
 
 
 def get_category_by_name(name):
-    category = json.loads(redis.get('category_{}'.format(name)).decode('utf-8'))
+    category = RedisSession().session.get('category_{}'.format(name))
     if not category:
         category = Category.objects(name=name).first().to_json()
-        redis.set('category_{}'.format(name), category)
+        RedisSession().session.set('category_{}'.format(name), category)
+    else:
+        category = json.loads(category.decode('utf-8'))
     return category
