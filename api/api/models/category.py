@@ -16,9 +16,9 @@ class Category(Document):
         for product in self.products:
             if str(product._id) == key:
                 return product
-            elif product.ean and key in product.ean:
+            elif product.ean and (key in product.ean):
                 return product
-            elif product.sku and key in product.sku:
+            elif product.sku and (key in product.sku):
                 return product
         raise DoesNotExist
 

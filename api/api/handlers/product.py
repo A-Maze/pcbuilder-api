@@ -15,10 +15,17 @@ from api.models.record import Record
 
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.lib.factories.category import CategoryFactory
-from api.models.category import get_all_categories
+from api.models.category import Category, get_all_categories
 from api.models.hardware import Hardware
 from jsonschema import validate
 log = logging.getLogger(__name__)
+
+record_view = partial(
+    view_config,
+    permission='public',
+    renderer='json',
+    context=Category,
+    name='record')
 
 product_factory_view = partial(
     view_config,
@@ -44,13 +51,6 @@ product_view = partial(
     renderer='json',
     context=Category,
     name='product')
-
-record_view = partial(
-    view_config,
-    permission='public',
-    renderer='json',
-    context=Category,
-    name='record')
 
 
 @products_view(request_method="GET")
@@ -111,39 +111,36 @@ def save_product(request):
 def save_records(request):
     """ handles the records requests """
     data = request.json_body
-    ean_numbers = data['ean'].split()
-    products = request.context
-    product = None
-    for number in ean_numbers:
-        try:
-            if number is not None:
-                print number
-                product = products.get_product(key=str(number))
-                continue
-        except DoesNotExist:
-            print "ean {} not found".format(number)
+    for item in data['items']:
+        obj = json.loads(item)
+        ean_numbers = obj['ean'].split()
+        products = request.context
+        product = None
+        for number in ean_numbers:
+            try:
+                if number is not None:
+                    print number
+                    product = products.get_product(key=str(number))
+                    continue
+            except DoesNotExist:
+                print "ean {} not found".format(number)
 
-    if not product:
-        try:
-            if data['sku']:
-                product = products.get_product(key=str(data['sku']))
-        except DoesNotExist:
-            return {"message": "product not found"}
-    else:
-        print 'found'
-        record = Record()
-        for field in data:
-            if field == 'price':
-                setattr(record, field, Decimal(data[field].replace(',', '.')))
-            else:
-                setattr(record, field, data[field])
-        print dir(product)
-        product.records.append(record)
-        print product.ean
-        product.save()
+        if not product:
+            try:
+                if obj['sku']:
+                    product = products.get_product(key=str(obj['sku']))
+            except DoesNotExist:
+                return {"message": "product not found"}
+        else:
+            print 'found'
+            record = Record(price=obj['price'].replace(',', '.'),
+                            webshop=obj['webshop'])
+
+            product.records.append(record)
+    request.context.save()
 
     return {
-        "message": "record saved"
+        "message": "records saved"
     }
 
 
