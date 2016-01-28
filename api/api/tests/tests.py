@@ -1,17 +1,16 @@
-import unittest
+from paste.deploy.loadwsgi import appconfig
+import os
+import urllib
+import logging
+here = os.path.dirname(__file__)
+settings = appconfig('config:' + os.path.join(here, '../../', 'test.ini'))
+log = logging.getLogger(__name__)
 
-from pyramid import testing
 
-class ViewTests(unittest.TestCase):
-    def setUp(self):
-        self.config = testing.setUp()
+class TestA(object):
+    def __init__(self):
+        self.base_url = 'http://{}:{}/category/'.format(
+            settings['mongodb.host'], settings['mongodb.port'])
 
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_my_view(self):
-        from api.views import my_view
-        request = testing.DummyRequest()
-        info = my_view(request)
-        self.assertEqual(info['project'], 'api')
-
+    def test_init(self):
+        response = urllib.request(self.base_url).read()
