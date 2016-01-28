@@ -7,6 +7,9 @@ README = open(os.path.join(here, '../README.md')).read()
 
 requires = [
     'pyramid',
+    'WebError',
+    'mongoengine',
+    'jsonschema',
     'pyramid_debugtoolbar',
     'paste',
     'redis',

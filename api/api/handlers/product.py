@@ -1,22 +1,31 @@
 import logging
 import json
-from functools import partial
 
+from jsonschema import validate
+from functools import partial
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
 from mongoengine.queryset import DoesNotExist
+from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
-
+from api.models.category import Category
+from api.models.record import Record
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.lib.factories.category import CategoryFactory
-from api.models.category import (Category, get_all_categories)
+from api.models.category import get_all_categories
 from api.models.hardware import Hardware
 
-
 log = logging.getLogger(__name__)
+
+record_view = partial(
+    view_config,
+    permission='public',
+    renderer='json',
+    context=Category,
+    name='record')
 
 product_factory_view = partial(
     view_config,
@@ -76,18 +85,64 @@ def save_product(request):
     """ handles both update and create requests """
     data = request.json_body
     try:
-        product = request.context.get_product(request.subpath[0])
-    except InvalidId:
-        return {"message": "Invalid id given"}
-    except DoesNotExist:
+        validate(data, json.loads(request.context.product_schema))
+    except ValidationError:
+        return {"message": "invalid data"}
+    if request.subpath:
+        try:
+            product = request.context.get_product(request.subpath[0])
+        except DoesNotExist:
+            return {"message": "product not found"}
+    else:
         product = Hardware()
         product._id = ObjectId()
         product.category = request.context.name
 
     for field in data:
-        setattr(product, field, data[field])
+        # there can not be a . in a field name so we remove that.
+        new_field = field.replace(".", "")
+        setattr(product, new_field, data[field])
+
+    request.context.products.append(product)
     request.context.products.save()
     return {"message": "product saved"}
+
+
+@record_view(request_method="POST")
+def save_records(request):
+    """ handles the records requests """
+    data = request.json_body
+    for item in data['items']:
+        item_ = json.loads(item)
+        ean_numbers = item_['ean'].split()
+        products = request.context
+        product = None
+        for number in ean_numbers:
+            try:
+                if number is not None:
+                    print number
+                    product = products.get_product(key=str(number))
+                    continue
+            except DoesNotExist:
+                print "ean {} not found".format(number)
+
+        if not product:
+            try:
+                if item_['sku']:
+                    product = products.get_product(key=str(item_['sku']))
+            except DoesNotExist:
+                return {"message": "product not found"}
+        else:
+            print 'found'
+            record = Record(price=item_['price'].replace(',', '.'),
+                            webshop=item_['webshop'])
+
+            product.records.append(record)
+    request.context.save()
+
+    return {
+        "message": "records saved"
+    }
 
 
 @product_factory_view(request_method="GET")
