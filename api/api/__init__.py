@@ -6,14 +6,12 @@ from pyramid.renderers import JSON
 from api.lib.factories.root import RootFactory
 from api.lib.renderer import object_id_adapter, datetime_adapter, set_adapter
 from mongoengine import connect
-import sys
 
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
     config = Configurator(settings=settings, root_factory=RootFactory)
-    reload(sys)  # Reload does the trick!
     sys.setdefaultencoding('UTF8')
     # MongoDB
     db_name = settings['mongodb.db_name']

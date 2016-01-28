@@ -1,7 +1,8 @@
 import logging
 import json
+
+from jsonschema import validate
 from functools import partial
-from decimal import Decimal
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -12,12 +13,11 @@ from jsonschema.exceptions import ValidationError
 from pyramid.view import view_config
 from api.models.category import Category
 from api.models.record import Record
-
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.lib.factories.category import CategoryFactory
-from api.models.category import Category, get_all_categories
+from api.models.category import get_all_categories
 from api.models.hardware import Hardware
-from jsonschema import validate
+
 log = logging.getLogger(__name__)
 
 record_view = partial(
@@ -99,6 +99,7 @@ def save_product(request):
         product.category = request.context.name
 
     for field in data:
+        # there can not be a . in a field name so we remove that.
         new_field = field.replace(".", "")
         setattr(product, new_field, data[field])
 
@@ -112,8 +113,8 @@ def save_records(request):
     """ handles the records requests """
     data = request.json_body
     for item in data['items']:
-        obj = json.loads(item)
-        ean_numbers = obj['ean'].split()
+        item_ = json.loads(item)
+        ean_numbers = item_['ean'].split()
         products = request.context
         product = None
         for number in ean_numbers:
@@ -127,14 +128,14 @@ def save_records(request):
 
         if not product:
             try:
-                if obj['sku']:
-                    product = products.get_product(key=str(obj['sku']))
+                if item_['sku']:
+                    product = products.get_product(key=str(item_['sku']))
             except DoesNotExist:
                 return {"message": "product not found"}
         else:
             print 'found'
-            record = Record(price=obj['price'].replace(',', '.'),
-                            webshop=obj['webshop'])
+            record = Record(price=item_['price'].replace(',', '.'),
+                            webshop=item_['webshop'])
 
             product.records.append(record)
     request.context.save()
