@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
+from api.models.meta import RedisSession
 from api.lib.factories.root import RootFactory
 from api.lib.renderer import object_id_adapter, datetime_adapter, set_adapter
 from mongoengine import connect
@@ -23,6 +24,8 @@ def main(global_config, **settings):
         db_password = None
     connect(db_name, username=db_user, password=db_password, host=db_host,
             port=db_port)
+    RedisSession(settings['redis.host'], settings['redis.port'],
+                 settings['redis.db'])
     config.add_route('home', '/')
     config.scan('api.handlers')
 
