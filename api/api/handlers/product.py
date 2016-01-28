@@ -147,12 +147,11 @@ def save_records(request):
 
 @product_factory_view(request_method="GET")
 def list_products(request):
-    return [product.to_mongo() for product_list in _get_products_list() for
-            product in product_list]
+    return _get_products_list()
 
 
 def _get_products_list():
-    return [category.products for category in get_all_categories()]
+    return [category['products'] for category in get_all_categories()]
 
 
 @filter_factory_view(request_method="GET")

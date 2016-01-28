@@ -12,6 +12,7 @@ requires = [
     'jsonschema',
     'pyramid_debugtoolbar',
     'paste',
+    'redis',
     'mongoengine']
 
 test_requires = [
