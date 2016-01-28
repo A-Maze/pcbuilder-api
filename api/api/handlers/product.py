@@ -120,11 +120,10 @@ def save_records(request):
         for number in ean_numbers:
             try:
                 if number is not None:
-                    print number
                     product = products.get_product(key=str(number))
                     continue
             except DoesNotExist:
-                print "ean {} not found".format(number)
+                log.critical('product not found')
 
         if not product:
             try:
@@ -133,7 +132,6 @@ def save_records(request):
             except DoesNotExist:
                 return {"message": "product not found"}
         else:
-            print 'found'
             record = Record(price=item_['price'].replace(',', '.'),
                             webshop=item_['webshop'])
 
