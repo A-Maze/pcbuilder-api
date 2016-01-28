@@ -13,7 +13,6 @@ def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
     config = Configurator(settings=settings, root_factory=RootFactory)
-    sys.setdefaultencoding('UTF8')
     # MongoDB
     db_name = settings['mongodb.db_name']
     db_host = settings['mongodb.host']
