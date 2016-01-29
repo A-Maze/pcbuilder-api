@@ -32,11 +32,15 @@ class Category(Document):
 def get_all_categories():
     categories = RedisSession().session.get('categories')
     if not categories:
-        categories = Category.objects.all().to_json()
-        RedisSession().session.set('categories', categories)
-        categories = json.loads(categories)
+        categories = Category.objects.all()
+        RedisSession().session.set('categories', categories.to_json())
     else:
-        categories = json.loads(categories.decode('utf-8'))
+        json_categories = json.loads(categories.decode('utf-8'))
+        categories = []
+        for json_category in json_categories:
+            category = Category()
+            category.set_fields(json_category)
+            categories.append(category)
     return categories
 
 
