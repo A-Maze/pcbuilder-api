@@ -16,11 +16,11 @@ class Category(Document):
 
     def get_product(self, key):
         for product in self.products:
-            if str(product._id) == key:
+            if str(product['_id']['$oid']) == key:
                 return product
-            elif product.ean and (key in product.ean):
+            elif product.get('ean', None) and (key in product['ean']):
                 return product
-            elif product.sku and (key in product.sku):
+            elif product.get('sku', None) and (key in product['sku']):
                 return product
         raise DoesNotExist
 
