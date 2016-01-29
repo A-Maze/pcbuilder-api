@@ -24,6 +24,10 @@ class Category(Document):
                 return product
         raise DoesNotExist
 
+    def set_fields(self, values):
+        for key, value in values.items():
+            setattr(self, key, value)
+
 
 def get_all_categories():
     categories = RedisSession().session.get('categories')
@@ -39,8 +43,11 @@ def get_all_categories():
 def get_category_by_name(name):
     category = RedisSession().session.get('category_{}'.format(name))
     if not category:
-        category = Category.objects(name=name).first().to_json()
-        RedisSession().session.set('category_{}'.format(name), category)
+        category = Category.objects(name=name).first()
+        RedisSession().session.set('category_{}'.format(name),
+                                   category.to_json())
     else:
-        category = json.loads(category.decode('utf-8'))
+        json_category = json.loads(category.decode('utf-8'))
+        category = Category()
+        category.set_fields(json_category)
     return category
