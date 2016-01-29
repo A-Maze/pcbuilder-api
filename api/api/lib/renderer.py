@@ -12,5 +12,10 @@ def datetime_adapter(obj, request):
             # TZ to UTC.
             return obj.isoformat()
 
+
 def set_adapter(obj, request):
     return list(obj)
+
+
+def mongo_adapter(obj, request):
+    return obj.to_mongo()

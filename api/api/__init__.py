@@ -4,8 +4,11 @@ from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
 from api.models.meta import RedisSession
+from api.models.record import Record
+from api.models.hardware import Hardware
 from api.lib.factories.root import RootFactory
-from api.lib.renderer import object_id_adapter, datetime_adapter, set_adapter
+from api.lib.renderer import (object_id_adapter, datetime_adapter,
+                              set_adapter, mongo_adapter)
 from mongoengine import connect
 
 
@@ -13,7 +16,6 @@ def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
     config = Configurator(settings=settings, root_factory=RootFactory)
-    sys.setdefaultencoding('UTF8')
     # MongoDB
     db_name = settings['mongodb.db_name']
     db_host = settings['mongodb.host']
@@ -35,5 +37,7 @@ def main(global_config, **settings):
         renderer.add_adapter(ObjectId, object_id_adapter)
         renderer.add_adapter(datetime.datetime, datetime_adapter)
         renderer.add_adapter(set, set_adapter)
+        renderer.add_adapter(Record, mongo_adapter)
+        renderer.add_adapter(Hardware, mongo_adapter)
         config.add_renderer(name, renderer)
     return config.make_wsgi_app()
