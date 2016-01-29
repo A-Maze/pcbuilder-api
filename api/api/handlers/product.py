@@ -151,6 +151,7 @@ def list_products(request):
 def _get_products_list():
     products_list = []
     for category in get_all_categories():
+        category = category.to_mongo()
         products_list.append({
             'products': category['products'],
             'product_schema': category['product_schema'],
