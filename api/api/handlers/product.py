@@ -149,7 +149,15 @@ def list_products(request):
 
 
 def _get_products_list():
-    return [category['products'] for category in get_all_categories()]
+    products_list = []
+    for category in get_all_categories():
+        products_list.append({
+            'products': category['products'],
+            'product_schema': category['product_schema'],
+            'category_name': category['name']
+        })
+
+    return products_list
 
 
 @filter_factory_view(request_method="GET")
@@ -159,21 +167,15 @@ def list_filters(request):
 
 def _process_product_filters(products_list):
     filter_list = []
-    for products in products_list:
+    for products_dict in products_list:
         # List the column that this category can be filtered on
-        try:
-            category_filters = {"filters": {},
-                                "category": products[0].category}
-            filter_fields = json.loads(
-                str(products[0]._instance.product_schema)
-            )["required"]
-            filter_fields.remove("name")  # We don't need to name in filters
+        category_filters = {"filters": {},
+                            "category": products_dict['category_name']}
 
-        except KeyError:
-            # If we can't find the products category we can't use it
-            log.info("Category not found: {}".format(products[0].category))
+        filter_fields = json.loads(products_dict['product_schema'])['required']
+        filter_fields.remove("name")  # We don't need to name in filters
 
-        for product in products:
+        for product in products_dict['products']:
             # Check the possible filter values per product
             for key in filter_fields:
                 try:
@@ -181,7 +183,7 @@ def _process_product_filters(products_list):
                         key, set()).add(product[key])
                 except KeyError:
                     log.info("key {} not found for category {}".format(
-                        key, products[0].category
+                        key, products_dict['category_name']
                     ))
 
         filter_list.append(category_filters)
