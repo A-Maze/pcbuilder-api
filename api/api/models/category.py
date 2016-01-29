@@ -29,7 +29,7 @@ class Category(Document):
             setattr(self, key, value)
 
 
-def get_all_categories():
+def get_all_categories(searchterm='', for_sale=None):
     categories = RedisSession().session.get('categories')
     if not categories:
         categories = Category.objects.all()
@@ -41,6 +41,19 @@ def get_all_categories():
             category = Category()
             category.set_fields(json_category)
             categories.append(category)
+
+    if any((searchterm, for_sale)):
+        searchterm.lower()
+
+        for category in categories:
+                filtered_products = []
+                for product in category.products:
+                    if searchterm not in product['name'].lower():
+                        continue
+                    if for_sale and not product['records']:
+                        continue
+                    filtered_products.append(product)
+                category.products = filtered_products
     return categories
 
 

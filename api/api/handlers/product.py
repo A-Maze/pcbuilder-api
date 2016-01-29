@@ -145,13 +145,12 @@ def save_records(request):
 
 @product_factory_view(request_method="GET")
 def list_products(request):
-    return _get_products_list()
+    return _get_products_list(request.GET)
 
 
-def _get_products_list():
+def _get_products_list(filters):
     products_list = []
-    for category in get_all_categories():
-        category = category.to_mongo()
+    for category in get_all_categories(**filters):
         products_list.append({
             'products': category['products'],
             'product_schema': category['product_schema'],
