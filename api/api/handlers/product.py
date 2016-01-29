@@ -10,7 +10,7 @@ from mongoengine.queryset import DoesNotExist
 from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
-from api.models.category import Category
+from api.models.category import Category, filter_category_products
 from api.models.record import Record
 from api.lib.factories.product import ProductFactory, FilterFactory
 from api.models.category import get_all_categories
@@ -54,7 +54,8 @@ product_view = partial(
 @products_view(request_method="GET")
 def return_products(request):
     """ returns all products in a category """
-    return {"products": request.context}
+    filters = request.GET
+    return {"products": filter_category_products(request.context, **filters)}
 
 
 @product_view(request_method="GET")
