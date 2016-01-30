@@ -79,7 +79,7 @@ def get_category_by_name(name, **kwargs):
 def filter_category_products(products, searchterm='', for_sale=None):
     """Filters a list of products based on the given arguments"""
 
-    searchterm.lower()
+    searchterm = searchterm.lower()
     filtered_products = []
     for product in products:
         if searchterm not in product['name'].lower():
