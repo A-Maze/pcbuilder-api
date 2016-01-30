@@ -144,7 +144,7 @@ def list_products(request):
     return _get_products_list(request.GET)
 
 
-def _get_products_list(filters=None):
+def _get_products_list(filters={}):
     products_list = []
     for category in get_all_categories(**filters):
         products_list.append({
