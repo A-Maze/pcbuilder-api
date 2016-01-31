@@ -3,7 +3,6 @@ import json
 
 from jsonschema import validate
 from functools import partial
-from bson.json_util import dumps
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
@@ -11,10 +10,9 @@ from mongoengine.queryset import DoesNotExist
 from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
-from api.models.category import Category
+from api.models.category import Category, filter_category_products
 from api.models.record import Record
 from api.lib.factories.product import ProductFactory, FilterFactory
-from api.lib.factories.category import CategoryFactory
 from api.models.category import get_all_categories
 from api.models.hardware import Hardware
 
@@ -41,7 +39,7 @@ filter_factory_view = partial(
 
 products_view = partial(
     view_config,
-    containment=CategoryFactory,
+    context='mongoengine.base.datastructures.EmbeddedDocumentList',
     permission='public',
     renderer='json')
 
@@ -56,9 +54,8 @@ product_view = partial(
 @products_view(request_method="GET")
 def return_products(request):
     """ returns all products in a category """
-    products = request.context
-    products_dict = [json.loads(dumps(obj.to_mongo())) for obj in products]
-    return {"products": products_dict}
+    filters = request.GET
+    return {"products": filter_category_products(request.context, **filters)}
 
 
 @product_view(request_method="GET")
@@ -76,8 +73,7 @@ def return_product(request):
     except DoesNotExist:
         return {"message": "product not found"}
 
-    product_json = json.loads(dumps(product.to_mongo()))
-    return {'product': product_json}
+    return {'product': product}
 
 
 @product_view(request_method="POST")
@@ -148,7 +144,7 @@ def list_products(request):
     return _get_products_list(request.GET)
 
 
-def _get_products_list(filters):
+def _get_products_list(filters={}):
     products_list = []
     for category in get_all_categories(**filters):
         products_list.append({

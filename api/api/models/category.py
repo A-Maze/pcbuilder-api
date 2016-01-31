@@ -16,11 +16,11 @@ class Category(Document):
 
     def get_product(self, key):
         for product in self.products:
-            if str(product._id) == key:
+            if str(product['_id']['$oid']) == key:
                 return product
-            elif product.ean and (key in product.ean):
+            elif product.get('ean', None) and (key in product['ean']):
                 return product
-            elif product.sku and (key in product.sku):
+            elif product.get('sku', None) and (key in product['sku']):
                 return product
         raise DoesNotExist
 
@@ -30,6 +30,12 @@ class Category(Document):
 
 
 def get_all_categories(searchterm='', for_sale=None):
+    """Returns all categories in a list
+
+    Optionally filters the products of these categories
+    based on a searchterm and if the product is for sale.
+    """
+
     categories = RedisSession().session.get('categories')
     if not categories:
         categories = Category.objects.all()
@@ -43,21 +49,19 @@ def get_all_categories(searchterm='', for_sale=None):
             categories.append(category)
 
     if any((searchterm, for_sale)):
-        searchterm.lower()
-
         for category in categories:
-                filtered_products = []
-                for product in category.products:
-                    if searchterm not in product['name'].lower():
-                        continue
-                    if for_sale and not product['records']:
-                        continue
-                    filtered_products.append(product)
-                category.products = filtered_products
+                category.products = filter_category_products(
+                    category.products, searchterm, for_sale)
     return categories
 
 
-def get_category_by_name(name):
+def get_category_by_name(name, **kwargs):
+    """Returns a category by name
+
+    Optionally the products of this category by the filters specified in
+    **kwargs.
+    """
+
     category = RedisSession().session.get('category_{}'.format(name))
     if not category:
         category = Category.objects(name=name).first()
@@ -67,4 +71,20 @@ def get_category_by_name(name):
         json_category = json.loads(category.decode('utf-8'))
         category = Category()
         category.set_fields(json_category)
+    category.products = filter_category_products(category.products, **kwargs)
+
     return category
+
+
+def filter_category_products(products, searchterm='', for_sale=None):
+    """Filters a list of products based on the given arguments"""
+
+    searchterm = searchterm.lower()
+    filtered_products = []
+    for product in products:
+        if searchterm not in product['name'].lower():
+            continue
+        if for_sale and not product['records']:
+            continue
+        filtered_products.append(product)
+    return filtered_products

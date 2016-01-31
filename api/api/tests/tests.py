@@ -12,34 +12,49 @@ log = logging.getLogger(__name__)
 
 class TestApi(object):
     def __init__(self):
-        self.base_url = 'http://{}:{}/category/'.format(
+        self.base_url = 'http://{}:{}/'.format(
             settings['mongodb.host'], '6543')
 
+    # get
     def test_category_name(self):
         response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'optical_drive')).read()
+                                   'category/optical_drive')).read()
         response_ = json.loads(response)
         assert_equal(response_['name'], 'optical_drive')
         assert_not_equal(response_['name'], 'cpu')
 
     def test_category_products(self):
         response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'optical_drive')).read()
+                                   'category/optical_drive')).read()
         response_ = json.loads(response)
         assert_equal(isinstance(response_['products'], list), True)
         assert_not_equal(isinstance(response_['products'], int), True)
 
     def test_product_call(self):
         response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'optical_drive/product/a')).read()
+                                   'category/optical_drive/product/a')).read()
         response_ = json.loads(response)
         assert_equal(response_['message'], 'product not found')
 
-    def test_product_post(self):
-        product = {}
-        product['name'] = 'test_product'
-        url = '{}{}'.format(self.base_url, 'optical_drive/product/')
-        response = urllib2.Request(url, product)
-        response.add_header('Content-Type', 'application/json')
-        resp = urllib2.urlopen(response)
-        assert_equal(resp['message'], 'product saved')
+    def test_filter_call(self):
+        response = urllib2.urlopen('{}{}'.format(self.base_url,
+                                   '/product/filters')).read()
+        response_ = json.loads(response)
+        assert_equal(response_[0]['category'], 'cpu')
+
+    def test_all_products_call(self):
+        response = urllib2.urlopen('{}{}'.format(self.base_url,
+                                   '/product')).read()
+        response_ = json.loads(response)
+        assert_equal(isinstance(response_, list), True)
+        assert_not_equal(isinstance(response_, int), True)
+
+    # post
+    # def test_product_post(self):
+    #     product = {}
+    #     product['name'] = 'test_product'
+    #     url = '{}{}'.format(self.base_url, 'optical_drive/product/')
+    #     response = urllib2.Request(url, product)
+    #     response.add_header('Content-Type', 'application/json')
+    #     resp = urllib2.urlopen(response)
+    #     assert_equal(resp['message'], 'product saved')
