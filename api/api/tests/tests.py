@@ -3,8 +3,12 @@ import os
 import urllib2
 import logging
 import json
+from api.models.hardware import Hardware
+from api.models.category import Category
+from api.models.record import Record
 from nose.tools import assert_equal
 from nose.tools import assert_not_equal
+from nose.tools import assert_raises
 here = os.path.dirname(__file__)
 settings = appconfig('config:' + os.path.join(here, '../../', 'test.ini'))
 log = logging.getLogger(__name__)
@@ -49,12 +53,37 @@ class TestApi(object):
         assert_equal(isinstance(response_, list), True)
         assert_not_equal(isinstance(response_, int), True)
 
+    def test_hardware_model(self):
+
+        def create_hardware():
+            hardware = Hardware()
+            hardware.name = 1
+        assert_raises(TypeError, create_hardware())
+
+    def test_record_model(self):
+
+        def create_record():
+            record = Record()
+            record.price = "12"
+        assert_raises(TypeError, create_record())
+
+    def test_category_model(self):
+
+        def create_category():
+            category = Category()
+            category.name = 12
+        assert_raises(TypeError, create_category())
+
     # post
-    # def test_product_post(self):
-    #     product = {}
-    #     product['name'] = 'test_product'
-    #     url = '{}{}'.format(self.base_url, 'optical_drive/product/')
-    #     response = urllib2.Request(url, product)
-    #     response.add_header('Content-Type', 'application/json')
-    #     resp = urllib2.urlopen(response)
-    #     assert_equal(resp['message'], 'product saved')
+    def test_product_post(self):
+        product = {
+            "name": 'naam',
+            "subname": 'subname',
+            "info": 'info',
+            "ean": 'ean',
+            "brand": 'brand'
+        }
+        url = '{}{}'.format(self.base_url, 'category/optical_drive/product/')
+        response = urllib2.Request(url, product)
+        resp = urllib2.urlopen(response)
+        assert_equal(resp['message'], 'product saved')
