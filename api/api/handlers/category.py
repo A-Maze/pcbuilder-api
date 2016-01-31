@@ -25,7 +25,8 @@ category_view = partial(
 def default_category_view(request):
     """ Returns all categories """
     categories = get_all_categories()
-    categories_dict = [json.loads(dumps(obj['name'])) for obj in categories]  # noqa
+    categories_dict = [obj.get_fields(('name', 'locale')) for
+                       obj in categories]
     return {"categories": categories_dict}
 
 

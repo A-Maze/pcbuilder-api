@@ -1,6 +1,6 @@
 import logging
 import json
-from mongoengine import (Document,
+from mongoengine import (Document, DictField,
                          StringField, EmbeddedDocumentListField)
 from mongoengine.queryset import DoesNotExist
 from api.models.hardware import Hardware  # noqa
@@ -13,6 +13,7 @@ class Category(Document):
     name = StringField(max_length=120)
     products = EmbeddedDocumentListField('Hardware')
     product_schema = StringField()
+    locale = DictField()
 
     def get_product(self, key):
         for product in self.products:
@@ -27,6 +28,9 @@ class Category(Document):
     def set_fields(self, values):
         for key, value in values.items():
             setattr(self, key, value)
+
+    def get_fields(self, fields=('name',)):
+        return dict((k, getattr(self, k, None)) for k in fields)
 
 
 def get_all_categories(searchterm='', for_sale=None):
