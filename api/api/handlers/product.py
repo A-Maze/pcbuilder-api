@@ -80,26 +80,28 @@ def return_product(request):
 def save_product(request):
     """ handles both update and create requests """
     data = request.json_body
-    try:
-        validate(data, json.loads(request.context.product_schema))
-    except ValidationError:
-        return {"message": "invalid data"}
-    if request.subpath:
+    for item in data['items']:
+        item_ = json.loads(item)
         try:
-            product = request.context.get_product(request.subpath[0])
-        except DoesNotExist:
-            return {"message": "product not found"}
-    else:
-        product = Hardware()
-        product._id = ObjectId()
-        product.category = request.context.name
+            validate(item_, json.loads(request.context.product_schema))
+        except ValidationError:
+            return {"message": "invalid data"}
+        if request.subpath:
+            try:
+                product = request.context.get_product(request.subpath[0])
+            except DoesNotExist:
+                return {"message": "product not found"}
+        else:
+            product = Hardware()
+            product._id = ObjectId()
+            product.category = request.context.name
 
-    for field in data:
-        # there can not be a . in a field name so we remove that.
-        new_field = field.replace(".", "")
-        setattr(product, new_field, data[field])
+        for field in item_:
+            # there can not be a . in a field name so we remove that.
+            new_field = field.replace(".", "")
+            setattr(product, new_field, item_[field])
 
-    request.context.products.append(product)
+        request.context.products.append(product)
     request.context.products.save()
     return {"message": "product saved"}
 
