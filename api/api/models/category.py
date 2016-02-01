@@ -16,13 +16,23 @@ class Category(Document):
     locale = DictField()
 
     def get_product(self, key):
-        for product in self.products:
-            if str(product['_id']['$oid']) == key:
-                return product
-            elif product.get('ean', None) and (key in product['ean']):
-                return product
-            elif product.get('sku', None) and (key in product['sku']):
-                return product
+        try:
+            for product in self.products:
+                if str(product['_id']['$oid']) == key:
+                    return product
+                elif product.get('ean', None) and (key in product['ean']):
+                    return product
+                elif product.get('sku', None) and (key in product['sku']):
+                    return product
+        except (AttributeError, TypeError):
+            # value is not yet cached and has to be handled differently
+            for product in self.products:
+                if str(product._id) == key:
+                    return product
+                elif product.ean and (key in product.ean):
+                    return product
+                elif product.sku and (key in product.sku):
+                    return product
         raise DoesNotExist
 
     def set_fields(self, values):
@@ -31,6 +41,9 @@ class Category(Document):
 
     def get_fields(self, fields=('name',)):
         return dict((k, getattr(self, k, None)) for k in fields)
+
+    def invalidate(self):
+        return RedisSession().session.delete('category_{}'.format(self.name))
 
 
 def get_all_categories(searchterm='', for_sale=None):

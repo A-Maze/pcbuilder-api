@@ -1,6 +1,7 @@
 import datetime
 from mongoengine import (StringField, DynamicEmbeddedDocument, ListField,
-                         DateTimeField, EmbeddedDocumentField, ObjectIdField)
+                         DateTimeField, EmbeddedDocumentField, ObjectIdField,
+                         DictField)
 from api.models.record import Record
 
 
@@ -12,11 +13,11 @@ class Hardware(DynamicEmbeddedDocument):
     info = StringField(max_length=500)
     stock = StringField(max_length=500)
     image = StringField(max_length=500)
-    ean = StringField(max_length=200)
-    sku = StringField(max_length=200)
-    SKU = StringField(max_length=200)
+    ean = StringField(max_length=5000)
+    sku = StringField(max_length=5000)
     link = StringField(max_length=200)
     brand = StringField(max_length=200)
     execution = StringField(max_length=200)
     records = ListField(EmbeddedDocumentField(Record))
+    current_prices = DictField()
     date_modified = DateTimeField(default=datetime.datetime.now)

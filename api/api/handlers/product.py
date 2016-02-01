@@ -121,6 +121,7 @@ def save_records(request):
             try:
                 if number is not None:
                     product = products.get_product(key=str(number))
+                    log.info(number)
                     continue
             except DoesNotExist:
                 log.info("product not found")
@@ -132,11 +133,15 @@ def save_records(request):
             except DoesNotExist:
                 log.info("product not found")
                 continue
-        record = Record(price=item_['price'].replace(',', '.'),
+        item_['price'] = item_['price'].replace(',', '.')
+        record = Record(price=item_['price'],
                         webshop=item_['webshop'])
 
         product.records.append(record)
+        product.current_prices.setdefault(item_['webshop'],
+                                          float(item_['price']))
     request.context.save()
+    request.context.invalidate()
 
     return {
         "message": "records saved"
