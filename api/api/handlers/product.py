@@ -86,11 +86,13 @@ def save_product(request):
             validate(item_, json.loads(request.context.product_schema))
         except ValidationError:
             log.info("invalid data")
+            continue
         if request.subpath:
             try:
                 product = request.context.get_product(request.subpath[0])
             except DoesNotExist:
                 log.info("product not found")
+                continue
         else:
             product = Hardware()
             product._id = ObjectId()
