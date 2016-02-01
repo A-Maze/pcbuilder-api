@@ -68,7 +68,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=0, offset=10):
     if any((searchterm, for_sale)):
         for category in categories:
                 category.products = filter_category_products(
-                    category.products[limit:offset], searchterm, for_sale)
+                    category.products[offset:(limit+offset)], searchterm, for_sale)
     return categories
 
 
@@ -89,7 +89,7 @@ def get_category_by_name(name, limit=0, offset=10, **kwargs):
         category = Category()
         category.set_fields(json_category)
     category.products = filter_category_products(
-        category.products[limit:offset], **kwargs)
+        category.products[offset:(limit+offset)], **kwargs)
 
     return category
 
