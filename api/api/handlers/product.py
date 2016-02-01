@@ -131,11 +131,11 @@ def save_records(request):
                     product = products.get_product(key=str(item_['sku']))
             except DoesNotExist:
                 log.info("product not found")
-        else:
-            record = Record(price=item_['price'].replace(',', '.'),
-                            webshop=item_['webshop'])
+                continue
+        record = Record(price=item_['price'].replace(',', '.'),
+                        webshop=item_['webshop'])
 
-            product.records.append(record)
+        product.records.append(record)
     request.context.save()
 
     return {
