@@ -1,11 +1,10 @@
 from paste.deploy.loadwsgi import appconfig
 import os
-import urllib2
 import logging
-import json
 from api.models.hardware import Hardware
 from api.models.category import Category
 from api.models.record import Record
+import requests
 from nose.tools import assert_equal
 from nose.tools import assert_not_equal
 from nose.tools import assert_raises
@@ -19,39 +18,33 @@ class TestApi(object):
         self.base_url = 'http://{}:{}/'.format(
             settings['mongodb.host'], '6543')
 
-    # get
     def test_category_name(self):
-        response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'category/optical_drive')).read()
-        response_ = json.loads(response)
-        assert_equal(response_['name'], 'optical_drive')
-        assert_not_equal(response_['name'], 'cpu')
+        response = requests.get('{}{}'.format(self.base_url,
+                                'category/optical_drive')).json()
+        assert_equal(response['name'], 'optical_drive')
+        assert_not_equal(response['name'], 'cpu')
 
     def test_category_products(self):
-        response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'category/optical_drive')).read()
-        response_ = json.loads(response)
-        assert_equal(isinstance(response_['products'], list), True)
-        assert_not_equal(isinstance(response_['products'], int), True)
+        response = requests.get('{}{}'.format(self.base_url,
+                                'category/optical_drive')).json()
+        assert_equal(isinstance(response['products'], list), True)
+        assert_not_equal(isinstance(response['products'], int), True)
 
     def test_product_call(self):
-        response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   'category/optical_drive/product/a')).read()
-        response_ = json.loads(response)
-        assert_equal(response_['message'], 'product not found')
+        response = requests.get('{}{}'.format(self.base_url,
+                                'category/optical_drive/product/a')).json()
+        assert_equal(response['message'], 'product not found')
 
     def test_filter_call(self):
-        response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   '/product/filters')).read()
-        response_ = json.loads(response)
-        assert_equal(response_[0]['category'], 'cpu')
+        response = requests.get('{}{}'.format(self.base_url,
+                                '/product/filters')).json()
+        assert_equal(response[0]['category'], 'cpu')
 
     def test_all_products_call(self):
-        response = urllib2.urlopen('{}{}'.format(self.base_url,
-                                   '/product')).read()
-        response_ = json.loads(response)
-        assert_equal(isinstance(response_, list), True)
-        assert_not_equal(isinstance(response_, int), True)
+        response = requests.get('{}{}'.format(self.base_url,
+                                '/product')).json()
+        assert_equal(isinstance(response, list), True)
+        assert_not_equal(isinstance(response, int), True)
 
     def test_hardware_model(self):
 
@@ -73,17 +66,3 @@ class TestApi(object):
             category = Category()
             category.name = 12
         assert_raises(TypeError, create_category())
-
-    # post
-    def test_product_post(self):
-        product = {
-            "name": 'naam',
-            "subname": 'subname',
-            "info": 'info',
-            "ean": 'ean',
-            "brand": 'brand'
-        }
-        url = '{}{}'.format(self.base_url, 'category/optical_drive/product/')
-        response = urllib2.Request(url, product)
-        resp = urllib2.urlopen(response)
-        assert_equal(resp['message'], 'product saved')
