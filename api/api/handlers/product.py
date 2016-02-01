@@ -85,12 +85,12 @@ def save_product(request):
         try:
             validate(item_, json.loads(request.context.product_schema))
         except ValidationError:
-            return {"message": "invalid data"}
+            log.info("invalid data")
         if request.subpath:
             try:
                 product = request.context.get_product(request.subpath[0])
             except DoesNotExist:
-                return {"message": "product not found"}
+                log.info("product not found")
         else:
             product = Hardware()
             product._id = ObjectId()
@@ -103,7 +103,7 @@ def save_product(request):
 
         request.context.products.append(product)
     request.context.products.save()
-    return {"message": "product saved"}
+    return {"message": "products saved"}
 
 
 @record_view(request_method="POST")
@@ -121,14 +121,14 @@ def save_records(request):
                     product = products.get_product(key=str(number))
                     continue
             except DoesNotExist:
-                log.critical('product not found')
+                log.info("product not found")
 
         if not product:
             try:
                 if item_['sku']:
                     product = products.get_product(key=str(item_['sku']))
             except DoesNotExist:
-                return {"message": "product not found"}
+                log.info("product not found")
         else:
             record = Record(price=item_['price'].replace(',', '.'),
                             webshop=item_['webshop'])
