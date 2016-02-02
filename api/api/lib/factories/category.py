@@ -11,6 +11,7 @@ class CategoryFactory(BaseFactory):
 
     def __getitem__(self, key):
         try:
-            return get_category_by_name(key)
+            filters = self.request.GET
+            return get_category_by_name(key, **filters)
         except:
             raise KeyError
