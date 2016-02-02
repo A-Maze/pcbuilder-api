@@ -46,13 +46,15 @@ class Category(Document):
         return RedisSession().session.delete('category_{}'.format(self.name))
 
 
-def get_all_categories(searchterm='', for_sale=None, limit=0, offset=10):
+def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
     """Returns all categories in a list
 
     Optionally filters the products of these categories
     based on a searchterm and if the product is for sale.
     """
     categories = RedisSession().session.get('categories')
+    start = int(offset)
+    end = int(limit) + start
     if not categories:
         categories = Category.objects.all()
         RedisSession().session.set('categories', categories.to_json())
@@ -69,6 +71,8 @@ def get_all_categories(searchterm='', for_sale=None, limit=0, offset=10):
                 category.products = filter_category_products(
                     category.products[offset:(limit+offset)],
                     searchterm, for_sale)
+    else:
+        categories = [category[start:end] for category in categories]
     return categories
 
 
