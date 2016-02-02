@@ -38,7 +38,7 @@ class TestApi(object):
     def test_filter_call(self):
         response = requests.get('{}{}'.format(self.base_url,
                                 '/product/filters')).json()
-        assert_equal(response[0]['category'], 'cpu')
+        assert_not_equal(len(response), 0)
 
     def test_all_products_call(self):
         response = requests.get('{}{}'.format(self.base_url,
