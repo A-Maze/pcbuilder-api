@@ -140,6 +140,7 @@ def save_records(request):
         product.records.append(record)
         product.current_prices.setdefault(item_['webshop'],
                                           float(item_['price']))
+        product.save()
     # sort products based on cheapest available price
     request.context.products = sorted(request.context.products,
                                       key=lambda k: 10 ^ 10 if not

@@ -94,7 +94,7 @@ def get_category_by_name(name, limit=0, offset=10, **kwargs):
     return category
 
 
-def filter_category_products(products, searchterm='', for_sale=None):
+def filter_category_products(products, searchterm='', for_sale=None, **kwargs):
     """Filters a list of products based on the given arguments"""
 
     searchterm = searchterm.lower()
