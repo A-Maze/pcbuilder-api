@@ -72,7 +72,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
                     category.products[offset:(limit+offset)],
                     searchterm, for_sale)
     else:
-        categories = [category[start:end] for category in categories]
+        categories = [category.products[start:end] for category in categories]
     return categories
 
 
