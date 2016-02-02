@@ -5,9 +5,8 @@ from api.models.hardware import Hardware
 from api.models.category import Category
 from api.models.record import Record
 import requests
-from nose.tools import assert_equal
-from nose.tools import assert_not_equal
-from nose.tools import assert_raises
+from nose.tools import assert_equal, assert_not_equal, assert_raises
+
 here = os.path.dirname(__file__)
 settings = appconfig('config:' + os.path.join(here, '../../', 'test.ini'))
 log = logging.getLogger(__name__)
