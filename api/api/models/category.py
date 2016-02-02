@@ -69,7 +69,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
     if any((searchterm, for_sale)):
         for category in categories:
                 category.products = filter_category_products(
-                    category.products[offset:(limit+offset)],
+                    category.products[start:end],
                     searchterm, for_sale)
     else:
         for category in categories:
