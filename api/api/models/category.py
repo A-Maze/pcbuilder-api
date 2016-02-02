@@ -52,6 +52,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
     Optionally filters the products of these categories
     based on a searchterm and if the product is for sale.
     """
+
     categories = RedisSession().session.get('categories')
     start = int(offset)
     end = int(limit) + start
@@ -83,6 +84,7 @@ def get_category_by_name(name, limit=10, offset=0, **kwargs):
     Optionally the products of this category by the filters specified in
     **kwargs.
     """
+
     category = RedisSession().session.get('category_{}'.format(name))
     if not category:
         category = Category.objects(name=name).first()
