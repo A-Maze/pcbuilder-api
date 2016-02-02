@@ -1,6 +1,6 @@
 import logging
 import json
-from mongoengine import (Document,
+from mongoengine import (Document, DictField,
                          StringField, EmbeddedDocumentListField)
 from mongoengine.queryset import DoesNotExist
 from api.models.hardware import Hardware  # noqa
@@ -13,23 +13,40 @@ class Category(Document):
     name = StringField(max_length=120)
     products = EmbeddedDocumentListField('Hardware')
     product_schema = StringField()
+    locale = DictField()
 
     def get_product(self, key):
-        for product in self.products:
-            if str(product['_id']['$oid']) == key:
-                return product
-            elif product.get('ean', None) and (key in product['ean']):
-                return product
-            elif product.get('sku', None) and (key in product['sku']):
-                return product
+        try:
+            for product in self.products:
+                if str(product['_id']['$oid']) == key:
+                    return product
+                elif product.get('ean', None) and (key in product['ean']):
+                    return product
+                elif product.get('sku', None) and (key in product['sku']):
+                    return product
+        except (AttributeError, TypeError):
+            # value is not yet cached and has to be handled differently
+            for product in self.products:
+                if str(product._id) == key:
+                    return product
+                elif product.ean and (key in product.ean):
+                    return product
+                elif product.sku and (key in product.sku):
+                    return product
         raise DoesNotExist
 
     def set_fields(self, values):
         for key, value in values.items():
             setattr(self, key, value)
 
+    def get_fields(self, fields=('name',)):
+        return dict((k, getattr(self, k, None)) for k in fields)
 
-def get_all_categories(searchterm='', for_sale=None):
+    def invalidate(self):
+        return RedisSession().session.delete('category_{}'.format(self.name))
+
+
+def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
     """Returns all categories in a list
 
     Optionally filters the products of these categories
@@ -37,6 +54,8 @@ def get_all_categories(searchterm='', for_sale=None):
     """
 
     categories = RedisSession().session.get('categories')
+    start = int(offset)
+    end = int(limit) + start
     if not categories:
         categories = Category.objects.all()
         RedisSession().session.set('categories', categories.to_json())
@@ -51,11 +70,14 @@ def get_all_categories(searchterm='', for_sale=None):
     if any((searchterm, for_sale)):
         for category in categories:
                 category.products = filter_category_products(
-                    category.products, searchterm, for_sale)
+                    category.products[offset:(limit+offset)],
+                    searchterm, for_sale)
+    else:
+        categories = [category.products[start:end] for category in categories]
     return categories
 
 
-def get_category_by_name(name, **kwargs):
+def get_category_by_name(name, limit=10, offset=0, **kwargs):
     """Returns a category by name
 
     Optionally the products of this category by the filters specified in
@@ -71,12 +93,17 @@ def get_category_by_name(name, **kwargs):
         json_category = json.loads(category.decode('utf-8'))
         category = Category()
         category.set_fields(json_category)
-    category.products = filter_category_products(category.products, **kwargs)
+
+    # return only the range that was requested
+    start = int(offset)
+    end = int(limit) + start
+    category.products = filter_category_products(
+        category.products[start:end], **kwargs)
 
     return category
 
 
-def filter_category_products(products, searchterm='', for_sale=None):
+def filter_category_products(products, searchterm='', for_sale=None, **kwargs):
     """Filters a list of products based on the given arguments"""
 
     searchterm = searchterm.lower()
