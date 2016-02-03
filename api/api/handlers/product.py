@@ -188,6 +188,7 @@ def list_filters(request):
     else:
         return _process_product_filters(_get_products_list())
 
+
 def _process_product_filters(products_list):
     filter_list = []
     for products_dict in products_list:
