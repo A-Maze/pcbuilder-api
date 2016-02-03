@@ -54,9 +54,14 @@ def get_all_categories(searchterm='', for_sale=None, limit=None, offset=0):
     """
 
     categories = RedisSession().session.get('categories')
+
+    # Defining the range of products to be fetched
     start = int(offset)
     end = int(limit) + start if limit else limit
 
+    # if categores could not be retrieved from cache fetch it from the DB and
+    # write it to cache. Otherwise let the values retrieved from the cache
+    # represent itself as Category objects
     if not categories:
         categories = Category.objects.all()
         RedisSession().session.set('categories', categories.to_json())
@@ -65,6 +70,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=None, offset=0):
         categories = []
         for json_category in json_categories:
             category = Category()
+            json_category['products'] = json_category['products'][start:end]
             category.set_fields(json_category)
             categories.append(category)
 
@@ -87,15 +93,21 @@ def get_category_by_name(name, limit=None, offset=0, **kwargs):
     """
 
     category = RedisSession().session.get('category_{}'.format(name))
+
+    # Defining the range of products to be fetched
     start = int(offset)
     end = int(limit) + start if limit else limit
 
+    # If the category could not be received by name from the cache fetch it
+    # from the DB instead and write it to the cache. Otherwise let the value
+    # retrieved from the caches represent itself as a Category object
     if not category:
         category = Category.objects(name=name).first()
         RedisSession().session.set('category_{}'.format(name),
                                    category.to_json())
     else:
         json_category = json.loads(category.decode('utf-8'))
+        json_category['products'] = json_category['products'][start:end]
         category = Category()
         category.set_fields(json_category)
 
@@ -118,3 +130,14 @@ def filter_category_products(products, searchterm='', for_sale=None, **kwargs):
             continue
         filtered_products.append(product)
     return filtered_products
+
+
+def get_categories_info():
+    """Returns only basic info about the category excluding products"""
+
+    categories_info = RedisSession().session.get('categories_info')
+
+    if not categories_info:
+        categories_info = Category.objects().only('name', 'locale')
+        RedisSession().session.set('category_info', categories_info.to_json())
+    return categories_info
