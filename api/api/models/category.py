@@ -46,7 +46,7 @@ class Category(Document):
         return RedisSession().session.delete('category_{}'.format(self.name))
 
 
-def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
+def get_all_categories(searchterm='', for_sale=None, limit=None, offset=0):
     """Returns all categories in a list
 
     Optionally filters the products of these categories
@@ -55,7 +55,8 @@ def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
 
     categories = RedisSession().session.get('categories')
     start = int(offset)
-    end = int(limit) + start
+    end = int(limit) + start if limit else limit
+
     if not categories:
         categories = Category.objects.all()
         RedisSession().session.set('categories', categories.to_json())
@@ -78,7 +79,7 @@ def get_all_categories(searchterm='', for_sale=None, limit=10, offset=0):
     return categories
 
 
-def get_category_by_name(name, limit=10, offset=0, **kwargs):
+def get_category_by_name(name, limit=None, offset=0, **kwargs):
     """Returns a category by name
 
     Optionally the products of this category by the filters specified in
@@ -86,6 +87,9 @@ def get_category_by_name(name, limit=10, offset=0, **kwargs):
     """
 
     category = RedisSession().session.get('category_{}'.format(name))
+    start = int(offset)
+    end = int(limit) + start if limit else limit
+
     if not category:
         category = Category.objects(name=name).first()
         RedisSession().session.set('category_{}'.format(name),
@@ -96,8 +100,6 @@ def get_category_by_name(name, limit=10, offset=0, **kwargs):
         category.set_fields(json_category)
 
     # return only the range that was requested
-    start = int(offset)
-    end = int(limit) + start
     category.products = filter_category_products(
         category.products[start:end], **kwargs)
 
