@@ -84,8 +84,8 @@ def save_product(request):
         item_ = json.loads(item)
         try:
             validate(item_, json.loads(request.context.product_schema))
-        except ValidationError:
-            log.info("invalid data")
+        except ValidationError as e:
+            log.info("invalid data {}".format(e.message))
             continue
         if request.subpath:
             try:
