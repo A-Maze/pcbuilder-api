@@ -11,8 +11,10 @@ from jsonschema.exceptions import ValidationError
 
 from pyramid.view import view_config
 from api.models.category import Category, filter_category_products
+from api.models.meta import write_to_cache, get_from_cache
 from api.models.record import Record
 from api.lib.factories.product import ProductFactory, FilterFactory
+from api.lib.util import set_default
 from api.models.category import get_all_categories
 from api.models.hardware import Hardware
 
@@ -174,8 +176,17 @@ def _get_products_list(filters={}):
 
 @filter_factory_view(request_method="GET")
 def list_filters(request):
-    return _process_product_filters(_get_products_list())
+    """Returns a list of fields the products can be filtered on
 
+    Retrieve this value from cache if possible
+    """
+
+    filters = get_from_cache("category_filters")
+
+    if filters:
+        return json.loads(filters.decode('utf-8'))
+    else:
+        return _process_product_filters(_get_products_list())
 
 def _process_product_filters(products_list):
     filter_list = []
@@ -191,6 +202,8 @@ def _process_product_filters(products_list):
             # Check the possible filter values per product
             for key in filter_fields:
                 try:
+                    # Add possible filter value to the key if it exists
+                    # otherwise create it
                     category_filters["filters"].setdefault(
                         key, set()).add(product[key])
                 except KeyError:
@@ -199,5 +212,6 @@ def _process_product_filters(products_list):
                     ))
 
         filter_list.append(category_filters)
-
+    write_to_cache("category_filters", json.dumps(filter_list,
+                                                  default=set_default))
     return filter_list
