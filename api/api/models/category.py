@@ -65,6 +65,8 @@ def get_all_categories(searchterm='', for_sale=None, limit=None, offset=0):
     if not categories:
         categories = Category.objects.all()
         RedisSession().session.set('categories', categories.to_json())
+        for category in categories:
+            category.products = category.products[start:end]
     else:
         json_categories = json.loads(categories.decode('utf-8'))
         categories = []
@@ -77,11 +79,11 @@ def get_all_categories(searchterm='', for_sale=None, limit=None, offset=0):
     if any((searchterm, for_sale)):
         for category in categories:
                 category.products = filter_category_products(
-                    category.products[start:end],
+                    category.products,
                     searchterm, for_sale)
     else:
         for category in categories:
-            category.products = category.products[start:end]
+            category.products = category.products
     return categories
 
 
@@ -105,6 +107,7 @@ def get_category_by_name(name, limit=None, offset=0, **kwargs):
         category = Category.objects(name=name).first()
         RedisSession().session.set('category_{}'.format(name),
                                    category.to_json())
+        category.products = category.products[start:end]
     else:
         json_category = json.loads(category.decode('utf-8'))
         json_category['products'] = json_category['products'][start:end]
@@ -113,7 +116,7 @@ def get_category_by_name(name, limit=None, offset=0, **kwargs):
 
     # return only the range that was requested
     category.products = filter_category_products(
-        category.products[start:end], **kwargs)
+        category.products, **kwargs)
 
     return category
 
