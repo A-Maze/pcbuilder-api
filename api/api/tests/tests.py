@@ -41,7 +41,7 @@ class TestApi(object):
 
     def test_all_products_call(self):
         response = requests.get('{}{}'.format(self.base_url,
-                                '/product')).json()
+                                '/product?limit=10')).json()
         assert_equal(isinstance(response, list), True)
         assert_not_equal(isinstance(response, int), True)
 
