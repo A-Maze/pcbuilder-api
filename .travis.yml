@@ -4,7 +4,7 @@ python:
 
 install: "pip install -e api/."
 
-script: nosetests
+script: nosetests api/api/tests
 
 notifications:
   slack: a-maze-team:KQAj0tr2neVDB38uGAQFcuA6
