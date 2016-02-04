@@ -15,7 +15,7 @@ class Hardware(DynamicEmbeddedDocument):
     image = StringField(max_length=500)
     ean = StringField(max_length=5000)
     sku = StringField(max_length=5000)
-    link = StringField(max_length=200)
+    links = DictField()
     brand = StringField(max_length=200)
     execution = StringField(max_length=200)
     records = ListField(EmbeddedDocumentField(Record))
